@@ -46,5 +46,4 @@ AI:
 
 ## Team
 
-Impact Byte
-ABB Accelerator 2026
+**Impact Byte**
