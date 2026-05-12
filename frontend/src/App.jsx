@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Activity, AlertTriangle, ChevronRight, Factory, Network, Plus, Shield, X, Zap } from 'lucide-react'
 import AlarmDetail from './components/AlarmDetail'
@@ -122,6 +122,29 @@ function App() {
   const handleAcknowledge = async id => { await acknowledgeAlarm(id); pushToast('Alarm acknowledged.', 'success') }
   const handleSnooze = async (id, min) => { await snoozeAlarm(id, min); pushToast(`Snoozed for ${min} min.`) }
   const handleEscalate = async id => { await escalateAlarm(id); pushToast('Alarm escalated to critical.', 'danger') }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Escape — close detail panel or modal
+      if (e.key === 'Escape') {
+        if (selectedAlarmId) setSelectedAlarmId(null)
+        else if (activePolicy) setActivePolicy(null)
+        else if (showEquipmentModal) setShowEquipmentModal(false)
+        else if (showShiftReport) setShowShiftReport(false)
+      }
+      // E — toggle Engineer mode (only if no input focused)
+      if (e.key === 'e' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        toggleRole()
+      }
+      // A — acknowledge selected alarm
+      if (e.key === 'a' && selectedAlarmId && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        handleAcknowledge(selectedAlarmId)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedAlarmId, activePolicy, showEquipmentModal, showShiftReport, toggleRole])
 
   return (
     <div className="flex min-h-screen bg-surface-base text-text-primary font-body relative overflow-hidden">

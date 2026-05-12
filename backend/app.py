@@ -30,6 +30,18 @@ def get_alarms():
     return jsonify(alarm_manager.get_serializable_alarms())
 
 
+@app.get("/api/health")
+def health_check():
+    """Health check endpoint for monitoring and debugging."""
+    from datetime import datetime
+    return jsonify({
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "alarm_count": len(alarm_manager.alarms),
+        "websocket_connected": True
+    })
+
+
 @app.get("/api/health-score")
 def get_health_score():
     return jsonify(score_alarm_health(alarm_manager.alarms))
