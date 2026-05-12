@@ -1,0 +1,24 @@
+# Core server
+flask==3.1.0
+flask-socketio==5.5.1
+flask-cors==5.0.1
+
+# Industrial protocol — OPC-UA (same protocol as real ABB hardware)
+asyncua==1.1.5
+
+# Data processing — ISA-18.2 alarm health scoring
+pandas==2.2.3
+numpy==2.2.3
+
+# AI explanations
+google-generativeai==0.8.5
+
+# Environment management
+python-dotenv==1.0.1
+
+# Time-series data (optional — for Grafana integration)
+influxdb-client==1.48.0
+
+# Utilities
+python-socketio==5.12.1
+eventlet==0.38.2

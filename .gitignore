@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# OptiSense HMI
+node_modules/
+__pycache__/
+.env
+dist/
+.DS_Store
+*.pyc
