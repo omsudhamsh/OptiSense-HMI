@@ -470,20 +470,25 @@ OptiSense-HMI/
 │   ├── tailwind.config.js     # Tailwind configuration
 │   └── eslint.config.js       # ESLint configuration
 │
-├── docs/                       # Documentation
+├── docs/                       # Technical documentation
 │   ├── ABB_PRESENTATION_READY.md
-│   └── (other docs)
+│   └── (other technical docs)
+│
+├── qa-docs/                    # QA & Testing documentation
+│   ├── README.md              # QA docs index
+│   ├── DEMO_CHECKLIST.md      # Demo script (5-7 min)
+│   ├── QA_FINAL_SUMMARY.md    # Executive QA summary
+│   ├── QA_TEST_REPORT.md      # Comprehensive QA results
+│   ├── TEST_SCRIPT.md         # Manual test cases
+│   └── README_UPDATE_SUMMARY.md
 │
 ├── .github/                    # GitHub configuration
 │   └── copilot-instructions.md
 │
 ├── README.md                   # This file
-├── LICENSE                     # MIT License
-├── .gitignore                 # Git ignore rules
 ├── QUICK_START.md             # 2-minute setup guide
-├── DEMO_CHECKLIST.md          # Demo script
-├── QA_TEST_REPORT.md          # QA documentation
-└── TEST_SCRIPT.md             # Test cases
+├── LICENSE                     # MIT License
+└── .gitignore                 # Git ignore rules
 ```
 
 ---
@@ -625,14 +630,25 @@ OptiSense-HMI/
 
 ## 📚 Documentation
 
+### Main Documentation
 | Document | Purpose |
 |----------|---------|
+| **README.md** | This file - complete project documentation |
 | **QUICK_START.md** | 2-minute setup guide |
-| **DEMO_CHECKLIST.md** | Step-by-step demo script with timing |
-| **ABB_PRESENTATION_READY.md** | Technical overview for ABB presentation |
-| **QA_TEST_REPORT.md** | Comprehensive QA results and test coverage |
-| **TEST_SCRIPT.md** | Manual test cases (50+ scenarios) |
-| **QA_FINAL_SUMMARY.md** | Executive QA summary |
+| **docs/ABB_PRESENTATION_READY.md** | Technical overview for ABB presentation |
+
+### QA & Testing Documentation
+All QA and testing resources are in the **`qa-docs/`** folder:
+
+| Document | Purpose |
+|----------|---------|
+| **qa-docs/DEMO_CHECKLIST.md** | Step-by-step demo script (5-7 minutes) |
+| **qa-docs/QA_FINAL_SUMMARY.md** | Executive QA summary (98/100 score) |
+| **qa-docs/QA_TEST_REPORT.md** | Comprehensive QA results and test coverage |
+| **qa-docs/TEST_SCRIPT.md** | Manual test cases (50+ scenarios, 15 minutes) |
+| **qa-docs/README_UPDATE_SUMMARY.md** | Documentation of README updates |
+
+📁 **See [qa-docs/README.md](qa-docs/README.md) for complete QA documentation index**
 
 ---
 
