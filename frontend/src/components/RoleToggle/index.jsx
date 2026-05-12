@@ -1,33 +1,32 @@
 import { motion } from 'framer-motion'
 import { User, Wrench } from 'lucide-react'
-import { C } from '../../styles/tokens'
 
 export default function RoleToggle({ role, toggleRole }) {
   const isOp = role === 'operator'
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary }}>Role</p>
-        <span style={{ fontSize:10, fontWeight:600, color: isOp ? C.p4 : C.accent }}>
-          {isOp ? 'Operator' : 'Engineer'}
+    <div className="flex flex-col gap-2.5">
+      <div className="flex items-center justify-between px-1">
+        <p className="text-[11px] font-bold tracking-widest uppercase text-text-tertiary">Role</p>
+        <span className={`text-[10px] font-bold tracking-wide transition-colors ${isOp ? 'text-isa-p4 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'text-accent drop-shadow-[0_0_8px_rgba(0,212,170,0.6)]'}`}>
+          {isOp ? 'OPERATOR' : 'ENGINEER'}
         </span>
       </div>
 
-      <div style={{ position:'relative', display:'flex', background:'rgba(8,12,24,0.9)', border:`1px solid ${C.border}`, borderRadius:10, padding:4 }}>
+      <div className="relative flex bg-surface-card/80 border border-surface-border/80 rounded-xl p-1 shadow-inner backdrop-blur-md">
         <motion.div
-          style={{ position:'absolute', top:4, left:4, height:'calc(100% - 8px)', width:'calc(50% - 4px)', borderRadius:8, background: isOp ? 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1))' : 'linear-gradient(135deg, rgba(0,212,170,0.2), rgba(0,212,170,0.1))', border: `1px solid ${isOp ? 'rgba(59,130,246,0.3)' : 'rgba(0,212,170,0.3)'}` }}
+          className={`absolute top-1 left-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-lg border shadow-lg ${isOp ? 'bg-gradient-to-br from-blue-500/20 to-blue-500/5 border-blue-500/30' : 'bg-gradient-to-br from-accent/20 to-accent/5 border-accent/30'}`}
           animate={{ x: isOp ? 0 : '100%' }}
-          transition={{ type:'spring', stiffness:280, damping:24 }}
+          transition={{ type:'spring', stiffness:350, damping:25 }}
         />
-        <button type="button" onClick={() => isOp || toggleRole()} style={{ position:'relative', zIndex:1, flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, borderRadius:8, padding:'8px 0', fontSize:12, fontWeight:700, color: isOp ? C.p4 : C.textTertiary, cursor:'pointer', background:'none', border:'none', transition:'color 160ms', fontFamily:'Inter,sans-serif' }}>
-          <User size={12} /> OPR
+        <button type="button" onClick={() => isOp || toggleRole()} className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-colors font-body outline-none ${isOp ? 'text-isa-p4' : 'text-text-tertiary hover:text-text-secondary'}`}>
+          <User size={14} /> OPR
         </button>
-        <button type="button" onClick={() => isOp && toggleRole()} style={{ position:'relative', zIndex:1, flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, borderRadius:8, padding:'8px 0', fontSize:12, fontWeight:700, color: !isOp ? C.accent : C.textTertiary, cursor:'pointer', background:'none', border:'none', transition:'color 160ms', fontFamily:'Inter,sans-serif' }}>
-          <Wrench size={12} /> ENG
+        <button type="button" onClick={() => isOp && toggleRole()} className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-colors font-body outline-none ${!isOp ? 'text-accent' : 'text-text-tertiary hover:text-text-secondary'}`}>
+          <Wrench size={14} /> ENG
         </button>
       </div>
 
-      <p style={{ fontSize:10, color:C.textTertiary, lineHeight:1.4 }}>
+      <p className="text-[10px] text-text-tertiary leading-relaxed px-1 font-medium">
         {isOp ? 'Operator — 3 priority actions visible' : 'Engineer — Full data access enabled'}
       </p>
     </div>

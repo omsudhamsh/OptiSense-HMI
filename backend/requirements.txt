@@ -7,8 +7,8 @@ flask-cors==5.0.1
 asyncua==1.1.5
 
 # Data processing — ISA-18.2 alarm health scoring
-pandas==2.2.3
-numpy==2.2.3
+pandas>=2.0.0
+numpy>=1.24.0
 
 # AI explanations
 google-generativeai==0.8.5

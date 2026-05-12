@@ -1,7 +1,6 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Activity, AlertTriangle, ChevronRight, Factory, Network, Plus, Shield, X, Zap } from 'lucide-react'
-import { C, S, btn } from './styles/tokens'
 import AlarmDetail from './components/AlarmDetail'
 import AlarmFeed from './components/AlarmFeed'
 import ArchitectureView from './components/ArchitectureView'
@@ -52,35 +51,31 @@ const POLICIES = {
   ]}
 }
 
-function Btn({ variant='secondary', size='md', onClick, disabled, children, style={}, ...rest }) {
-  const [hov, setHov] = useState(false)
-  const [act, setAct] = useState(false)
-  const base = { ...btn.base, ...(size==='sm'?btn.sm:size==='lg'?btn.lg:{}), ...btn[variant]||btn.secondary }
-  const hoverStyle = variant==='primary'
-    ? { background:'#00BFAA', boxShadow:'0 0 20px rgba(0,212,170,0.4)', transform:'translateY(-1px)' }
-    : variant==='danger'
-    ? { background:'rgba(255,140,0,0.2)', boxShadow:'0 0 14px rgba(255,140,0,0.25)', transform:'translateY(-1px)' }
-    : variant==='critical'
-    ? { background:'rgba(255,45,45,0.2)', boxShadow:'0 0 14px rgba(255,45,45,0.25)', transform:'translateY(-1px)' }
-    : variant==='ghost'
-    ? { background:C.elevated, color:C.textPrimary }
-    : { borderColor:'rgba(0,212,170,0.35)', color:C.textPrimary, background:'rgba(0,212,170,0.06)', transform:'translateY(-1px)' }
+function Btn({ variant='secondary', size='md', onClick, disabled, children, className='', ...rest }) {
+  const baseClasses = "inline-flex items-center justify-center gap-2 font-body font-medium transition-all duration-200 select-none outline-none whitespace-nowrap rounded-lg border";
+  
+  const sizeClasses = {
+    sm: "text-xs px-3 py-1.5 min-h-[28px]",
+    md: "text-sm px-4 py-2 min-h-[34px]",
+    lg: "text-base px-5 py-3 min-h-[42px]"
+  }[size] || sizeClasses.md;
+
+  const variantClasses = {
+    primary: "bg-accent text-surface-base border-accent hover:shadow-[0_0_20px_rgba(0,212,170,0.4)] hover:-translate-y-px font-semibold",
+    secondary: "bg-transparent text-text-secondary border-surface-border hover:bg-surface-hover hover:text-text-primary",
+    danger: "bg-isa-p2/10 text-isa-p2 border-isa-p2/30 hover:bg-isa-p2/20 hover:shadow-[0_0_14px_rgba(255,140,0,0.25)] hover:-translate-y-px",
+    critical: "bg-isa-p1/10 text-isa-p1 border-isa-p1/30 hover:bg-isa-p1/20 hover:shadow-[0_0_14px_rgba(255,45,45,0.25)] hover:-translate-y-px",
+    ghost: "bg-transparent text-text-tertiary border-transparent hover:bg-surface-elevated hover:text-text-primary !p-1.5 rounded-full min-h-[32px] min-w-[32px]"
+  }[variant] || variantClasses.secondary;
+
+  const disabledClasses = "opacity-40 cursor-not-allowed pointer-events-none";
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      onMouseEnter={()=>setHov(true)}
-      onMouseLeave={()=>{setHov(false);setAct(false)}}
-      onMouseDown={()=>setAct(true)}
-      onMouseUp={()=>setAct(false)}
-      style={{
-        ...base,
-        ...(hov&&!disabled?hoverStyle:{}),
-        ...(act&&!disabled?{transform:'scale(0.97)',boxShadow:'none'}:{}),
-        ...(disabled?{opacity:0.4,cursor:'not-allowed',pointerEvents:'none'}:{}),
-        ...style
-      }}
+      className={`${baseClasses} ${sizeClasses} ${variantClasses} ${disabled ? disabledClasses : 'active:scale-[0.97]'} ${className}`}
       {...rest}
     >
       {children}
@@ -129,52 +124,52 @@ function App() {
   const handleEscalate = async id => { await escalateAlarm(id); pushToast('Alarm escalated to critical.', 'danger') }
 
   return (
-    <div style={{ display:'flex', minHeight:'100vh', background:C.base, color:C.textPrimary, fontFamily:'Inter,sans-serif', position:'relative' }}>
-
+    <div className="flex min-h-screen bg-surface-base text-text-primary font-body relative overflow-hidden">
+      
       {/* SIDEBAR */}
-      <aside style={{ width:240, flexShrink:0, display:'flex', flexDirection:'column', background:'rgba(8,12,24,0.97)', borderRight:`1px solid ${C.border}`, position:'sticky', top:0, height:'100vh', overflow:'hidden' }}>
-
+      <aside className="w-60 shrink-0 flex flex-col bg-surface-card/90 backdrop-blur-xl border-r border-surface-border sticky top-0 h-screen overflow-hidden z-20 shadow-2xl">
+        
         {/* Brand */}
-        <div style={{ padding:'24px 20px 20px' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
-            <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#00D4AA,#0066CC)', boxShadow:'0 0 16px rgba(0,212,170,0.4)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <Zap size={16} color="white" />
+        <div className="p-6 pb-5">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-accent to-blue-600 shadow-[0_0_16px_rgba(0,212,170,0.4)] flex items-center justify-center shrink-0">
+              <Zap size={16} className="text-white" />
             </div>
-            <span style={{ fontFamily:'Space Grotesk,sans-serif', fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px' }}>OptiSense</span>
+            <span className="font-display text-xl font-bold text-text-primary tracking-tight">OptiSense</span>
           </div>
-          <p style={{ fontSize:11, color:C.textTertiary, paddingLeft:42 }}>ABB Accelerator · ISA-18.2</p>
+          <p className="text-[11px] text-text-tertiary pl-11">ABB Accelerator · ISA-18.2</p>
         </div>
 
-        <div style={{ height:1, background:`linear-gradient(90deg,transparent,${C.border},transparent)`, margin:'0 20px' }} />
+        <div className="h-px bg-gradient-to-r from-transparent via-surface-border to-transparent mx-5" />
 
         {/* Nav */}
-        <nav style={{ padding:'12px 12px 0' }}>
+        <nav className="p-3 pt-4 flex flex-col gap-1">
           {NAV.map(({id, label, icon:Icon}) => {
             const active = activeView === id
             return (
               <NavItem key={id} active={active} onClick={() => setActiveView(id)}>
-                <Icon size={15} color={active ? C.accent : C.textSecondary} />
-                <span style={{ flex:1 }}>{label}</span>
-                {active && <ChevronRight size={13} color={C.accent} style={{ opacity:0.6 }} />}
+                <Icon size={16} className={active ? "text-accent" : "text-text-secondary"} />
+                <span className="flex-1">{label}</span>
+                {active && <ChevronRight size={14} className="text-accent opacity-60" />}
               </NavItem>
             )
           })}
         </nav>
 
         {/* Equipment groups */}
-        <div style={{ padding:'20px 20px 0' }}>
-          <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary, marginBottom:10 }}>Equipment Groups</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+        <div className="p-5 pt-3">
+          <p className="text-[11px] font-semibold tracking-wider uppercase text-text-tertiary mb-3">Equipment Groups</p>
+          <div className="flex flex-col gap-1.5">
             {equipmentGroups.length === 0
-              ? [1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height:32 }} />)
+              ? [1,2,3,4].map(i => <div key={i} className="skeleton h-8 w-full rounded-lg" />)
               : equipmentGroups.map(([type, items]) => {
                   const crit = items.filter(a => a.severity==='CRITICAL').length
                   return (
-                    <div key={type} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(18,27,46,0.7)', border:`1px solid ${C.border}`, borderRadius:9, padding:'7px 12px' }}>
-                      <span style={{ fontSize:13, color:C.textSecondary, textTransform:'capitalize' }}>{type.replace('_',' ')}</span>
-                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                        {crit > 0 && <span style={{ width:18, height:18, borderRadius:'50%', background:C.p1, color:'white', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>{crit}</span>}
-                        <span style={{ fontFamily:'JetBrains Mono,monospace', fontSize:12, color:C.textTertiary }}>{items.length}</span>
+                    <div key={type} className="flex items-center justify-between bg-surface-elevated/50 border border-surface-border/50 rounded-lg px-3 py-2 transition-colors hover:bg-surface-elevated/80">
+                      <span className="text-xs text-text-secondary capitalize font-medium">{type.replace('_',' ')}</span>
+                      <div className="flex items-center gap-2">
+                        {crit > 0 && <span className="w-5 h-5 rounded-full bg-isa-p1 text-white text-[10px] font-bold flex items-center justify-center shadow-[0_0_8px_rgba(255,45,45,0.4)] animate-pulse-slow">{crit}</span>}
+                        <span className="font-mono text-xs text-text-tertiary">{items.length}</span>
                       </div>
                     </div>
                   )
@@ -183,146 +178,158 @@ function App() {
         </div>
 
         {/* Bottom */}
-        <div style={{ marginTop:'auto', padding:'0 20px 20px', display:'flex', flexDirection:'column', gap:12 }}>
+        <div className="mt-auto p-5 flex flex-col gap-3">
           {/* Connection */}
-          <div style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(18,27,46,0.7)', border:`1px solid ${C.border}`, borderRadius:9, padding:'9px 12px' }}>
-            <div style={{ position:'relative', flexShrink:0 }}>
-              <span className={isConnected ? 'pulse-dot' : ''} style={{ display:'block', width:8, height:8, borderRadius:'50%', background: isConnected ? C.accent : C.p2 }} />
+          <div className="flex items-center gap-3 bg-surface-elevated/50 border border-surface-border/50 rounded-xl p-3">
+            <div className="relative shrink-0 flex items-center justify-center w-3 h-3">
+              {isConnected && <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-20"></span>}
+              <span className={`block w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-accent shadow-[0_0_8px_rgba(0,212,170,0.6)]' : 'bg-isa-p2'} z-10`} />
             </div>
             <div>
-              <p style={{ fontSize:12, fontWeight:500, color:C.textSecondary }}>{isConnected ? 'OPC-UA Connected' : 'Reconnecting…'}</p>
-              <p style={{ fontSize:10, color:C.textTertiary }}>localhost:4840</p>
+              <p className="text-xs font-medium text-text-secondary">{isConnected ? 'OPC-UA Connected' : 'Reconnecting…'}</p>
+              <p className="text-[10px] text-text-tertiary">localhost:4840</p>
             </div>
           </div>
 
           <RoleToggle role={role} toggleRole={toggleRole} />
 
-          <div style={{ height:1, background:`linear-gradient(90deg,transparent,${C.border},transparent)` }} />
+          <div className="h-px bg-gradient-to-r from-transparent via-surface-border to-transparent" />
 
           {/* Policy links */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'4px 8px' }}>
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             {Object.entries(POLICIES).map(([key, p]) => (
               <PolicyLink key={key} onClick={() => setActivePolicy(key)}>{p.title}</PolicyLink>
             ))}
           </div>
-          <p style={{ fontSize:10, color:C.textTertiary }}>v1.0.0 · ABB Hackathon 2026</p>
+          <p className="text-[10px] text-text-tertiary mt-1">v2.0.0 · OptiSense Core</p>
         </div>
       </aside>
 
       {/* MAIN */}
-      <main style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-surface-elevated/20 via-surface-base to-surface-base relative">
+        
+        {/* Dynamic Background Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
 
         {/* Header */}
-        <header style={{ height:64, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', background:'rgba(8,12,24,0.92)', borderBottom:`1px solid ${C.border}`, backdropFilter:'blur(16px)', zIndex:10 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+        <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-surface-card/40 border-b border-surface-border/50 backdrop-blur-2xl z-10 sticky top-0">
+          <div className="flex items-center gap-5">
             <HealthScore variant="compact" healthScore={healthScore} />
-            <div style={{ width:1, height:32, background:C.border }} />
-            <div>
-              <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary }}>Shift 06:00–14:00</p>
-              <p style={{ fontSize:12, color:C.textSecondary, marginTop:2 }}>ISA-18.2 compliance active</p>
+            <div className="w-px h-8 bg-surface-border/50" />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-text-tertiary">Shift 06:00–14:00</span>
+              <span className="text-xs text-text-secondary font-medium mt-0.5 flex items-center gap-1.5">
+                <Shield size={12} className="text-accent" /> ISA-18.2 Active
+              </span>
             </div>
           </div>
           {role === 'engineer' && activeView === 'operations' && (
-            <div style={{ display:'flex', gap:8 }}>
-              <Btn variant="secondary" size="sm" onClick={() => setShowShiftReport(true)}>Shift Report</Btn>
-              <Btn variant="primary" size="sm" onClick={() => setShowEquipmentModal(true)}>
-                <Plus size={13} /> Add Equipment
-              </Btn>
+            <div className="flex gap-3">
+              <button type="button" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-surface-border text-sm font-medium text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all duration-200 outline-none" onClick={() => setShowShiftReport(true)}>Shift Report</button>
+              <button type="button" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-accent/40 bg-accent/10 text-sm font-medium text-accent hover:bg-accent hover:text-base hover:shadow-[0_0_12px_rgba(0,212,170,0.4)] transition-all duration-200 outline-none" onClick={() => setShowEquipmentModal(true)}>
+                <Plus size={14} /> Add Equipment
+              </button>
             </div>
           )}
         </header>
 
         {/* Content area */}
-        <div style={{ flex:1, overflowY:'auto' }}>
-          <div style={{ padding:'24px' }}>
-            {activeView === 'architecture' ? (
-              <ArchitectureView />
-            ) : (
-              <AnimatePresence mode="wait">
-                <motion.div key={role} initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} exit={{opacity:0,y:6}} transition={{duration:0.18}} style={{ display:'flex', flexDirection:'column', gap:20 }}>
+        <div className="flex-1 overflow-y-auto relative z-0 p-6">
+          {activeView === 'architecture' ? (
+            <ArchitectureView />
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div key={role} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="flex flex-col gap-6 max-w-7xl mx-auto">
 
-                  {/* Engineer tabs */}
-                  {role === 'engineer' && (
-                    <div style={{ display:'flex', gap:4, background:'rgba(13,20,36,0.9)', border:`1px solid ${C.border}`, borderRadius:12, padding:4, width:'fit-content' }}>
-                      {ENG_TABS.map(({id, label, icon:Icon}) => {
-                        const active = engineerTab === id
-                        return (
-                          <EngTab key={id} active={active} onClick={() => setEngineerTab(id)}>
-                            <Icon size={12} />
-                            {label}
-                          </EngTab>
-                        )
-                      })}
-                    </div>
+                {/* Engineer tabs */}
+                {role === 'engineer' && (
+                  <div className="flex gap-1 bg-surface-elevated/40 border border-surface-border/50 rounded-xl p-1 w-fit backdrop-blur-md">
+                    {ENG_TABS.map(({id, label, icon:Icon}) => {
+                      const active = engineerTab === id
+                      return (
+                        <EngTab key={id} active={active} onClick={() => setEngineerTab(id)}>
+                          <Icon size={14} />
+                          {label}
+                        </EngTab>
+                      )
+                    })}
+                  </div>
+                )}
+
+                <AnimatePresence mode="wait">
+                  {role==='engineer' && engineerTab==='health' && (
+                    <motion.div key="health" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>
+                      <HealthScore variant="full" healthScore={healthScore} />
+                    </motion.div>
                   )}
-
-                  <AnimatePresence mode="wait">
-                    {role==='engineer' && engineerTab==='health' && (
-                      <motion.div key="health" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:8}}>
-                        <HealthScore variant="full" healthScore={healthScore} />
-                      </motion.div>
-                    )}
-                    {role==='engineer' && engineerTab==='dependencies' && (
-                      <motion.div key="deps" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:8}}>
-                        <DependencyGraph alarms={alarms} onSelect={setSelectedAlarmId} />
-                      </motion.div>
-                    )}
-                    {role==='engineer' && engineerTab==='equipment' && (
-                      <motion.div key="equip" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:8}}>
-                        <TemplateLibrary />
-                      </motion.div>
-                    )}
-                    {(role==='operator' || engineerTab==='alarms') && (
-                      <motion.div key="alarms" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:8}}>
-                        <AlarmFeed alarms={alarms} selectedAlarmId={selectedAlarmId} onSelect={setSelectedAlarmId} onAcknowledge={handleAcknowledge} onSnooze={handleSnooze} onEscalate={handleEscalate} newAlarmIds={newAlarmIds} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </AnimatePresence>
-            )}
-          </div>
-
-          {/* Footer */}
-          <footer style={{ borderTop:`1px solid ${C.border}`, padding:'10px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(8,12,24,0.6)' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, color:C.textTertiary }}>
-              <Zap size={11} color={C.accent} />
-              <span>OptiSense HMI · ABB Accelerator 2026</span>
-            </div>
-            <div style={{ display:'flex', gap:20 }}>
-              {Object.entries(POLICIES).map(([key, p]) => (
-                <PolicyLink key={key} onClick={() => setActivePolicy(key)}>{p.title}</PolicyLink>
-              ))}
-            </div>
-          </footer>
+                  {role==='engineer' && engineerTab==='dependencies' && (
+                    <motion.div key="deps" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>
+                      <DependencyGraph alarms={alarms} onSelect={setSelectedAlarmId} />
+                    </motion.div>
+                  )}
+                  {role==='engineer' && engineerTab==='equipment' && (
+                    <motion.div key="equip" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>
+                      <TemplateLibrary />
+                    </motion.div>
+                  )}
+                  {(role==='operator' || engineerTab==='alarms') && (
+                    <motion.div key="alarms" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>
+                      <AlarmFeed alarms={alarms} selectedAlarmId={selectedAlarmId} onSelect={setSelectedAlarmId} onAcknowledge={handleAcknowledge} onSnooze={handleSnooze} onEscalate={handleEscalate} newAlarmIds={newAlarmIds} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          )}
         </div>
+
+        {/* Footer */}
+        <footer className="border-t border-surface-border/50 px-6 py-3 flex items-center justify-between bg-surface-base/50 backdrop-blur-md z-10">
+          <div className="flex items-center gap-2 text-[11px] text-text-tertiary font-medium">
+            <Zap size={12} className="text-accent" />
+            <span>OptiSense HMI · Advanced Industrial Operations</span>
+          </div>
+          <div className="flex gap-5">
+            {Object.entries(POLICIES).map(([key, p]) => (
+              <PolicyLink key={key} onClick={() => setActivePolicy(key)}>{p.title}</PolicyLink>
+            ))}
+          </div>
+        </footer>
       </main>
 
       {/* DETAIL PANEL */}
       <AnimatePresence>
         {selectedAlarm && (
-          <motion.aside key="detail" initial={{x:'100%',opacity:0}} animate={{x:0,opacity:1}} exit={{x:'100%',opacity:0}} transition={{type:'spring',stiffness:260,damping:28}}
-            style={{ width:400, flexShrink:0, borderLeft:`1px solid ${C.border}`, background:'rgba(10,15,26,0.98)', backdropFilter:'blur(24px)', overflowY:'auto', display:'flex', flexDirection:'column' }}>
+          <motion.aside key="detail" initial={{x:'100%', opacity:0.5}} animate={{x:0, opacity:1}} exit={{x:'100%', opacity:0}} transition={{type:'spring', stiffness:300, damping:30}}
+            className="w-[420px] shrink-0 border-l border-surface-border/50 bg-surface-card/95 backdrop-blur-2xl overflow-y-auto flex flex-col absolute right-0 top-0 bottom-0 z-30 shadow-[-20px_0_40px_rgba(0,0,0,0.5)]">
             <AlarmDetail alarm={selectedAlarm} onClose={() => setSelectedAlarmId(null)} onAcknowledge={() => handleAcknowledge(selectedAlarm.id)} onSnooze={min => handleSnooze(selectedAlarm.id, min)} onEscalate={() => handleEscalate(selectedAlarm.id)} fetchExplanation={fetchExplanation} />
           </motion.aside>
         )}
       </AnimatePresence>
 
+      {/* OVERLAY for detail panel on small screens */}
+      <AnimatePresence>
+        {selectedAlarm && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-black/40 backdrop-blur-sm z-20 pointer-events-auto lg:pointer-events-none" onClick={() => setSelectedAlarmId(null)} />
+        )}
+      </AnimatePresence>
+
       {/* MODALS */}
       <EquipmentModal open={showEquipmentModal} onClose={() => setShowEquipmentModal(false)} onGenerate={handleAddEquipment} />
-      <ShiftReport open={showShiftReport} onClose={() => setShowShiftReport(false)} />
+      <ShiftReport open={showShiftReport} onClose={() => setShowShiftReport(false)} alarms={alarms} />
       <PolicyModal open={!!activePolicy} policyKey={activePolicy} content={activePolicy ? POLICIES[activePolicy] : null} allPolicies={POLICIES} onNavigate={setActivePolicy} onClose={() => setActivePolicy(null)} />
 
       {/* TOASTS */}
-      <div className="no-print" style={{ position:'fixed', bottom:24, right:24, zIndex:9999, display:'flex', flexDirection:'column', gap:8 }}>
+      <div className="no-print fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map(toast => (
-            <motion.div key={toast.id} initial={{opacity:0,y:10,scale:0.95}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:8,scale:0.95}} transition={{type:'spring',stiffness:300,damping:25}}
-              style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(18,27,46,0.97)', border:`1px solid ${toast.variant==='success'?'rgba(0,212,170,0.3)':toast.variant==='danger'?'rgba(255,45,45,0.3)':C.border}`, borderRadius:12, padding:'10px 14px', fontSize:13, color:C.textSecondary, backdropFilter:'blur(16px)', maxWidth:300, boxShadow:'0 8px 32px rgba(0,0,0,0.4)' }}>
-              <div style={{ width:24, height:24, borderRadius:'50%', background:toast.variant==='success'?'rgba(0,212,170,0.12)':toast.variant==='danger'?'rgba(255,45,45,0.12)':'rgba(30,45,69,0.6)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                <Factory size={12} color={toast.variant==='success'?C.accent:toast.variant==='danger'?C.p1:C.textSecondary} />
+            <motion.div key={toast.id} initial={{opacity:0,y:20,scale:0.9}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:10,scale:0.95}} transition={{type:'spring',stiffness:400,damping:25}}
+              className={`flex items-center gap-3 bg-surface-card/95 border rounded-xl p-3 pr-4 text-sm text-text-primary backdrop-blur-xl max-w-sm shadow-card pointer-events-auto ${toast.variant==='success'?'border-accent/30 shadow-[0_8px_32px_rgba(0,212,170,0.15)]':toast.variant==='danger'?'border-isa-p1/30 shadow-[0_8px_32px_rgba(255,45,45,0.15)]':'border-surface-border'}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${toast.variant==='success'?'bg-accent/10 text-accent':toast.variant==='danger'?'bg-isa-p1/10 text-isa-p1':'bg-surface-elevated text-text-secondary'}`}>
+                <Factory size={14} />
               </div>
-              {toast.message}
+              <span className="font-medium">{toast.message}</span>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -332,31 +339,30 @@ function App() {
 }
 
 function NavItem({ active, onClick, children }) {
-  const [hov, setHov] = useState(false)
   return (
-    <button type="button" onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display:'flex', alignItems:'center', gap:8, width:'100%', padding:'9px 10px', borderRadius:9, border:`1px solid ${active?'rgba(0,212,170,0.18)':hov?C.border:'transparent'}`, background:active?'rgba(0,212,170,0.08)':hov?'rgba(30,45,69,0.5)':'transparent', color:active?C.textPrimary:hov?C.textPrimary:C.textSecondary, fontSize:14, fontWeight:500, fontFamily:'Inter,sans-serif', cursor:'pointer', transition:'all 160ms', marginBottom:2, position:'relative' }}>
-      {active && <span style={{ position:'absolute', left:0, top:'20%', height:'60%', width:2, background:C.accent, borderRadius:'0 2px 2px 0' }} />}
+    <button type="button" onClick={onClick}
+      className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl border font-medium text-sm transition-all duration-200 relative group outline-none
+        ${active ? 'bg-accent/10 border-accent/20 text-text-primary' : 'bg-transparent border-transparent text-text-secondary hover:bg-surface-elevated/50 hover:text-text-primary hover:border-surface-border/50'}`}>
+      {active && <span className="absolute left-0 top-[20%] h-[60%] w-[3px] bg-accent rounded-r-md shadow-[0_0_8px_rgba(0,212,170,0.6)]" />}
       {children}
     </button>
   )
 }
 
 function EngTab({ active, onClick, children }) {
-  const [hov, setHov] = useState(false)
   return (
-    <button type="button" onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', borderRadius:9, border:`1px solid ${active?'rgba(0,212,170,0.22)':'transparent'}`, background:active?'rgba(0,212,170,0.10)':hov?'rgba(30,45,69,0.5)':'transparent', color:active?C.accent:hov?C.textPrimary:C.textSecondary, fontSize:13, fontWeight:500, fontFamily:'Inter,sans-serif', cursor:'pointer', transition:'all 160ms', whiteSpace:'nowrap' }}>
+    <button type="button" onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200 outline-none
+        ${active ? 'bg-accent/10 border-accent/30 text-accent shadow-[0_0_12px_rgba(0,212,170,0.1)]' : 'bg-transparent border-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary'}`}>
       {children}
     </button>
   )
 }
 
 function PolicyLink({ onClick, children }) {
-  const [hov, setHov] = useState(false)
   return (
-    <button type="button" onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background:'none', border:'none', padding:0, fontSize:11, color:hov?C.accent:C.textTertiary, cursor:'pointer', transition:'color 160ms', textAlign:'left', fontFamily:'Inter,sans-serif' }}>
+    <button type="button" onClick={onClick}
+      className="bg-transparent border-none p-0 text-[11px] text-text-tertiary hover:text-accent transition-colors text-left font-body outline-none">
       {children}
     </button>
   )

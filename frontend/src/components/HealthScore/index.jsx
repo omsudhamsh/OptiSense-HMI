@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, useSpring } from 'framer-motion'
 import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { C } from '../../styles/tokens'
 
 const SCORE_CFG = [
-  { min:80, color:C.accent, label:'Excellent' },
-  { min:60, color:C.p3, label:'Good' },
-  { min:40, color:C.p2, label:'Warning' },
-  { min:0, color:C.p1, label:'Critical' }
+  { min:80, color:'var(--color-accent)', textClass:'text-accent', label:'Excellent' },
+  { min:60, color:'var(--color-isa-p3)', textClass:'text-isa-p3', label:'Good' },
+  { min:40, color:'var(--color-isa-p2)', textClass:'text-isa-p2', label:'Warning' },
+  { min:0, color:'var(--color-isa-p1)', textClass:'text-isa-p1', label:'Critical' }
 ]
 const STATUS_CFG = {
-  ok:       { color:C.accent, bg:C.accentDim, border:C.accentBorder, icon:TrendingUp },
-  warning:  { color:C.p3, bg:C.p3Dim, border:C.p3Border, icon:Minus },
-  critical: { color:C.p1, bg:C.p1Dim, border:C.p1Border, icon:TrendingDown }
+  ok:       { colorClass:'text-accent', bgClass:'bg-accent/10', borderClass:'border-accent/30', icon:TrendingUp },
+  warning:  { colorClass:'text-isa-p3', bgClass:'bg-isa-p3/10', borderClass:'border-isa-p3/30', icon:Minus },
+  critical: { colorClass:'text-isa-p1', bgClass:'bg-isa-p1/10', borderClass:'border-isa-p1/30', icon:TrendingDown }
 }
 
 function useAnimNum(target, precision=0) {
@@ -40,10 +39,10 @@ export default function HealthScore({ variant='compact', healthScore }) {
 
   if (variant === 'compact') {
     return (
-      <div style={{ display:'flex', alignItems:'center', gap:12, background:'rgba(18,27,46,0.8)', border:`1px solid ${C.border}`, borderRadius:12, padding:'10px 12px' }}>
-        <div style={{ position:'relative', width:44, height:44, flexShrink:0 }}>
-          <svg width="44" height="44" style={{ transform:'rotate(-90deg)' }}>
-            <circle cx="22" cy="22" r="20" stroke="rgba(30,45,69,0.8)" strokeWidth="4" fill="none" />
+      <div className="flex items-center gap-3 bg-surface-elevated/50 border border-surface-border/50 rounded-xl px-3 py-2 shadow-inner">
+        <div className="relative w-11 h-11 shrink-0">
+          <svg width="44" height="44" className="-rotate-90">
+            <circle cx="22" cy="22" r="20" stroke="var(--color-surface-border)" strokeWidth="4" fill="none" />
             <motion.circle cx="22" cy="22" r="20" stroke={cfg.color} strokeWidth="4" fill="none" strokeLinecap="round"
               initial={{ strokeDasharray:`0 ${circ}` }}
               animate={{ strokeDasharray:`${dash} ${circ-dash}` }}
@@ -51,71 +50,71 @@ export default function HealthScore({ variant='compact', healthScore }) {
               style={{ filter:`drop-shadow(0 0 6px ${cfg.color}60)` }}
             />
           </svg>
-          <span style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'JetBrains Mono,monospace', fontSize:12, fontWeight:700, color:cfg.color }}>
+          <span className={`absolute inset-0 flex items-center justify-center font-mono text-[13px] font-bold ${cfg.textClass}`}>
             {scoreDisplay}
           </span>
         </div>
-        <div>
-          <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary }}>Alarm Health</p>
-          <p style={{ fontSize:12, color:C.textSecondary, marginTop:2 }}>ISA-18.2 · Grade {grade}</p>
+        <div className="flex flex-col justify-center">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-text-tertiary">Alarm Health</p>
+          <p className="text-xs text-text-secondary mt-0.5 font-medium">ISA-18.2 · Grade {grade}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <section style={{ display:'flex', flexDirection:'column', gap:16 }}>
+    <section className="flex flex-col gap-6">
       {/* Hero */}
-      <div style={{ background:'rgba(13,20,36,0.85)', border:`1px solid ${C.border}`, borderRadius:18, padding:24 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+      <div className="glass-panel-heavy rounded-3xl p-8">
+        <div className="flex items-center justify-between">
           <div>
-            <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary, marginBottom:8 }}>System Health Score</p>
-            <div style={{ display:'flex', alignItems:'baseline', gap:8 }}>
-              <motion.span style={{ fontFamily:'Space Grotesk,sans-serif', fontSize:48, fontWeight:700, color:cfg.color }}>
+            <p className="text-xs font-bold tracking-widest uppercase text-text-tertiary mb-3">System Health Score</p>
+            <div className="flex items-baseline gap-2">
+              <motion.span className={`font-display text-6xl font-bold tracking-tight ${cfg.textClass} drop-shadow-[0_0_16px_currentColor]`}>
                 {scoreDisplay}
               </motion.span>
-              <span style={{ fontSize:20, color:C.textTertiary }}>/100</span>
+              <span className="text-2xl text-text-tertiary font-medium">/100</span>
             </div>
-            <p style={{ fontSize:14, color:C.textSecondary, marginTop:4 }}>{cfg.label} · ISA-18.2</p>
+            <p className="text-sm text-text-secondary mt-2 font-medium">{cfg.label} · ISA-18.2</p>
           </div>
 
-          <div style={{ position:'relative', width:96, height:96 }}>
-            <svg width="96" height="96" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx="48" cy="48" r="40" stroke="rgba(30,45,69,0.6)" strokeWidth="8" fill="none" />
-              <motion.circle cx="48" cy="48" r="40" stroke={cfg.color} strokeWidth="8" fill="none" strokeLinecap="round"
-                initial={{ strokeDasharray:`0 ${2*Math.PI*40}` }}
-                animate={{ strokeDasharray:`${(score/100)*2*Math.PI*40} ${(1-score/100)*2*Math.PI*40}` }}
+          <div className="relative w-28 h-28">
+            <svg width="112" height="112" className="-rotate-90">
+              <circle cx="56" cy="56" r="48" stroke="var(--color-surface-border)" strokeWidth="10" fill="none" className="opacity-50" />
+              <motion.circle cx="56" cy="56" r="48" stroke={cfg.color} strokeWidth="10" fill="none" strokeLinecap="round"
+                initial={{ strokeDasharray:`0 ${2*Math.PI*48}` }}
+                animate={{ strokeDasharray:`${(score/100)*2*Math.PI*48} ${(1-score/100)*2*Math.PI*48}` }}
                 transition={{ duration:1.2, ease:'easeOut' }}
-                style={{ filter:`drop-shadow(0 0 10px ${cfg.color}50)` }}
+                style={{ filter:`drop-shadow(0 0 12px ${cfg.color}80)` }}
               />
             </svg>
-            <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ fontFamily:'Space Grotesk,sans-serif', fontSize:28, fontWeight:700, color:cfg.color }}>{grade}</span>
-              <span style={{ fontSize:10, color:C.textTertiary }}>Grade</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={`font-display text-3xl font-bold ${cfg.textClass} drop-shadow-[0_0_8px_currentColor]`}>{grade}</span>
+              <span className="text-[11px] text-text-tertiary font-medium">Grade</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* KPIs */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="grid grid-cols-2 gap-4">
         {kpis.map((kpi, i) => {
           const s = STATUS_CFG[kpi.status] || STATUS_CFG.ok
           const Icon = s.icon
           return (
             <motion.div key={kpi.label} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:i*0.07}}
-              style={{ background:'rgba(13,20,36,0.85)', border:`1px solid ${C.border}`, borderRadius:14, padding:16 }}>
-              <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
-                <p style={{ fontSize:12, color:C.textSecondary, lineHeight:1.3 }}>{kpi.label}</p>
-                <span style={{ display:'flex', alignItems:'center', gap:4, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius:999, padding:'2px 8px', fontSize:10, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase' }}>
-                  <Icon size={9} />
+              className="glass-panel rounded-2xl p-5 hover:bg-surface-elevated/70 transition-colors">
+              <div className="flex items-start justify-between mb-4">
+                <p className="text-[13px] text-text-secondary font-medium leading-snug">{kpi.label}</p>
+                <span className={`flex items-center gap-1.5 ${s.bgClass} ${s.colorClass} border ${s.borderClass} rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase`}>
+                  <Icon size={10} />
                   {kpi.status}
                 </span>
               </div>
-              <p style={{ fontFamily:'JetBrains Mono,monospace', fontSize:20, fontWeight:700, color:C.textPrimary }}>{kpi.value}</p>
-              <p style={{ fontSize:10, color:C.textTertiary, marginTop:2 }}>Target: {kpi.target}</p>
-              <div style={{ marginTop:12, height:4, width:'100%', borderRadius:999, background:'rgba(30,45,69,0.8)', overflow:'hidden' }}>
-                <motion.div style={{ height:'100%', borderRadius:999, background:s.color }}
+              <p className="font-mono text-2xl font-bold text-text-primary tracking-tight">{kpi.value}</p>
+              <p className="text-[11px] text-text-tertiary mt-1 font-medium">Target: {kpi.target}</p>
+              <div className="mt-4 h-1.5 w-full rounded-full bg-surface-base border border-surface-border overflow-hidden">
+                <motion.div className="h-full rounded-full bg-current shadow-[0_0_8px_currentColor]" style={{ color: s.colorClass.replace('text-', 'var(--color-') + ')' }}
                   initial={{ width:0 }}
                   animate={{ width:`${kpi.progress}%` }}
                   transition={{ duration:0.8, delay:i*0.07, ease:'easeOut' }}
@@ -128,16 +127,16 @@ export default function HealthScore({ variant='compact', healthScore }) {
 
       {/* Recommendations */}
       {(healthScore?.recommendations||[]).length > 0 && (
-        <div style={{ background:'rgba(13,20,36,0.85)', border:`1px solid ${C.border}`, borderRadius:14, padding:16 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-            <Activity size={13} color={C.accent} />
-            <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.09em', textTransform:'uppercase', color:C.textTertiary }}>AI Recommendations</p>
+        <div className="glass-panel rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Activity size={14} className="text-accent" />
+            <p className="text-[11px] font-bold tracking-widest uppercase text-accent">AI Recommendations</p>
           </div>
-          <ul style={{ display:'flex', flexDirection:'column', gap:8, listStyle:'none', padding:0, margin:0 }}>
+          <ul className="flex flex-col gap-2.5 list-none p-0 m-0">
             {healthScore.recommendations.map((item, i) => (
               <motion.li key={item} initial={{opacity:0,x:-8}} animate={{opacity:1,x:0}} transition={{delay:i*0.05}}
-                style={{ display:'flex', alignItems:'flex-start', gap:10, fontSize:13, color:C.textSecondary }}>
-                <span style={{ marginTop:6, width:6, height:6, borderRadius:'50%', background:C.accent, flexShrink:0 }} />
+                className="flex items-start gap-3 text-sm text-text-secondary font-medium">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0 shadow-[0_0_8px_rgba(0,212,170,0.8)]" />
                 {item}
               </motion.li>
             ))}

@@ -18,7 +18,7 @@ async def run_opc_ua_server(alarm_manager):
     """
     server = Server()
     await server.init()
-    server.set_endpoint("opc.tcp://0.0.0.0:4840/optisense/")
+    server.set_endpoint("opc.tcp://0.0.0.0:4841/optisense/")
     namespace_idx = await server.register_namespace("OptisenseHMI")
     objects = server.nodes.objects
     root = await objects.add_object(namespace_idx, "OptisenseHMI")
@@ -38,7 +38,7 @@ async def run_opc_ua_server(alarm_manager):
         value_nodes[alarm_id] = value_node
         status_nodes[alarm_id] = status_node
 
-    print("OPC-UA Server running at opc.tcp://localhost:4840/optisense/")
+    print("OPC-UA Server running at opc.tcp://localhost:4841/optisense/")
 
     async with server:
         while True:
@@ -52,7 +52,7 @@ async def run_opc_ua_server(alarm_manager):
                 value_node = value_nodes.get(alarm_id)
                 status_node = status_nodes.get(alarm_id)
                 if value_node:
-                    await value_node.write_value(ua.Variant(float(alarm.get("value", 0.0)), ua.VariantType.Float))
+                    await value_node.write_value(ua.Variant(float(alarm.get("value", 0.0)), ua.VariantType.Double))
                 if status_node:
                     await status_node.write_value(status)
             await asyncio.sleep(4)

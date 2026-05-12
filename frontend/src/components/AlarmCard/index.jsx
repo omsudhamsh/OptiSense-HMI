@@ -1,10 +1,16 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Waves } from 'lucide-react'
-import { C, SEVERITY } from '../../styles/tokens'
 
 const TREND_ICONS = { rising: ArrowUpRight, falling: ArrowDownRight, oscillating: Waves, stable: ArrowRight }
-const TREND_COLORS = { rising: C.p1, falling: C.accent, oscillating: C.p3, stable: C.textTertiary }
+const TREND_COLORS = { rising: 'text-isa-p1', falling: 'text-accent', oscillating: 'text-isa-p3', stable: 'text-text-tertiary' }
+const SEVERITY_CFG = {
+  CRITICAL:      { color: '#FF2D2D', borderClass: 'border-isa-p1/30', bgClass: 'bg-isa-p1/10', textClass: 'text-isa-p1', shadowClass: 'shadow-[0_0_12px_rgba(255,45,45,0.25)]' },
+  HIGH:          { color: '#FF8C00', borderClass: 'border-isa-p2/30', bgClass: 'bg-isa-p2/10', textClass: 'text-isa-p2', shadowClass: 'shadow-none' },
+  MEDIUM:        { color: '#FFD700', borderClass: 'border-isa-p3/30', bgClass: 'bg-isa-p3/10', textClass: 'text-isa-p3', shadowClass: 'shadow-none' },
+  LOW:           { color: '#3B82F6', borderClass: 'border-isa-p4/30', bgClass: 'bg-isa-p4/10', textClass: 'text-isa-p4', shadowClass: 'shadow-none' },
+  INFORMATIONAL: { color: '#3B82F6', borderClass: 'border-isa-p4/30', bgClass: 'bg-isa-p4/10', textClass: 'text-isa-p4', shadowClass: 'shadow-none' },
+}
 
 const fmt = (v, u) => !u ? `${v}` : u==='C' ? `${v}°C` : u==='%' ? `${v}%` : `${v} ${u}`
 const spark = (vals=[]) => {
@@ -18,10 +24,9 @@ const spark = (vals=[]) => {
 }
 
 export default function AlarmCard({ alarm, selected, onSelect, onAcknowledge, onSnooze, onEscalate, isNew }) {
-  const [hov, setHov] = useState(false)
-  const cfg = SEVERITY[alarm.severity] || SEVERITY.LOW
+  const cfg = SEVERITY_CFG[alarm.severity] || SEVERITY_CFG.LOW
   const TrendIcon = TREND_ICONS[alarm.trend] || ArrowRight
-  const trendColor = TREND_COLORS[alarm.trend] || C.textTertiary
+  const trendColorClass = TREND_COLORS[alarm.trend] || 'text-text-tertiary'
   const sparkPoints = spark(alarm.history)
   const isP1 = alarm.ai_priority === 1
 
@@ -31,111 +36,88 @@ export default function AlarmCard({ alarm, selected, onSelect, onAcknowledge, on
       initial={{ opacity:0, y:8 }}
       animate={{ opacity:1, y:0 }}
       onClick={onSelect}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className={isP1 ? 'pulse-critical' : ''}
+      className={`relative overflow-hidden bg-surface-card rounded-2xl cursor-pointer transition-all duration-300 group
+        ${isP1 ? 'pulse-critical' : ''}
+        ${selected ? 'border-accent/30 shadow-[0_0_0_1px_rgba(0,212,170,0.15),0_12px_40px_rgba(0,0,0,0.6)] -translate-y-1' : 'border-surface-border shadow-card hover:shadow-card-hover hover:-translate-y-1'}`}
       style={{
-        position:'relative',
-        overflow:'hidden',
-        background: C.card,
-        border: `1px solid ${selected ? 'rgba(0,212,170,0.3)' : C.border}`,
-        borderLeft: `3px solid ${cfg.color}`,
-        borderRadius: 14,
-        cursor: 'pointer',
-        transition: 'all 180ms',
-        transform: hov ? 'translateY(-2px)' : 'translateY(0)',
-        boxShadow: selected
-          ? `0 0 0 1px rgba(0,212,170,0.15), 0 8px 32px rgba(0,0,0,0.5)`
-          : hov
-          ? '0 6px 24px rgba(0,0,0,0.4)'
-          : '0 2px 12px rgba(0,0,0,0.3)'
+        borderWidth: '1px',
+        borderLeftWidth: '3px',
+        borderLeftColor: cfg.color
       }}
     >
       {/* Glow stripe */}
-      <div style={{ position:'absolute', left:0, top:0, width:3, height:'100%', background:`linear-gradient(180deg, ${cfg.color}, ${cfg.color}44)`, filter: isP1 ? `drop-shadow(0 0 6px ${cfg.color})` : 'none' }} />
+      <div className={`absolute left-0 top-0 w-[3px] h-full ${isP1 ? 'drop-shadow-[0_0_8px_var(--color-isa-p1)]' : ''}`} style={{ background: `linear-gradient(180deg, ${cfg.color}, ${cfg.color}44)` }} />
 
       {isNew && (
         <motion.span initial={{scale:0.8,opacity:0}} animate={{scale:1,opacity:1}}
-          style={{ position:'absolute', right:12, top:12, background:C.accentDim, color:C.accent, border:`1px solid ${C.accentBorder}`, borderRadius:999, padding:'2px 8px', fontSize:10, fontWeight:700, letterSpacing:'0.05em' }}>
+          className="absolute right-3 top-3 bg-accent/10 text-accent border border-accent/20 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest">
           NEW
         </motion.span>
       )}
 
-      <div style={{ padding:'14px 16px' }}>
-        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
+      <div className="p-4 pl-5">
+        <div className="flex items-start justify-between gap-4">
           {/* Left */}
-          <div style={{ display:'flex', alignItems:'flex-start', gap:12, minWidth:0 }}>
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, flexShrink:0 }}>
-              <div style={{ width:44, height:44, borderRadius:12, background:cfg.dim, border:`1px solid ${cfg.border}`, color:cfg.color, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'JetBrains Mono,monospace', fontSize:12, fontWeight:700, boxShadow: isP1 ? `0 0 12px ${cfg.color}40` : 'none' }}>
+          <div className="flex items-start gap-4 min-w-0">
+            <div className="flex flex-col items-center gap-2 shrink-0 pt-1">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-mono text-xs font-bold ${cfg.bgClass} ${cfg.borderClass} ${cfg.textClass} border ${cfg.shadowClass}`}>
                 P{alarm.ai_priority}
               </div>
-              <TrendIcon size={14} color={trendColor} />
+              <TrendIcon size={16} className={trendColorClass} />
             </div>
-            <div style={{ minWidth:0 }}>
-              <h3 style={{ fontFamily:'Space Grotesk,sans-serif', fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            <div className="min-w-0 flex flex-col justify-center pt-0.5">
+              <h3 className="font-display text-[15px] font-bold text-text-primary mb-1 truncate">
                 {alarm.equipment}
               </h3>
-              <p style={{ fontSize:12, color:C.textSecondary, marginBottom:6, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{alarm.fault}</p>
-              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ background:'rgba(30,45,69,0.8)', color:C.textTertiary, borderRadius:5, padding:'2px 6px', fontSize:10, fontFamily:'JetBrains Mono,monospace' }}>{alarm.location}</span>
-                <span style={{ fontSize:10, fontFamily:'JetBrains Mono,monospace', color:C.textTertiary }}>{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              <p className="text-sm text-text-secondary mb-2 truncate">{alarm.fault}</p>
+              <div className="flex items-center gap-2 mt-auto">
+                <span className="bg-surface-elevated/80 text-text-tertiary rounded p-1 px-2 text-[10px] font-mono border border-surface-border">{alarm.location}</span>
+                <span className="text-[10px] font-mono text-text-tertiary">{new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
               </div>
             </div>
           </div>
 
           {/* Right */}
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4, flexShrink:0 }}>
-            <div style={{ fontFamily:'JetBrains Mono,monospace', fontSize:20, fontWeight:700, color:C.textPrimary, lineHeight:1 }}>
+          <div className="flex flex-col items-end gap-1 shrink-0 pt-1">
+            <div className="font-mono text-[22px] font-bold text-text-primary leading-none tracking-tight">
               {fmt(alarm.value, alarm.unit)}
             </div>
-            <div style={{ fontSize:10, fontFamily:'JetBrains Mono,monospace', color:C.textTertiary }}>
+            <div className="text-[10px] font-mono text-text-tertiary mt-1">
               Threshold {fmt(alarm.threshold, alarm.unit)}
             </div>
             {sparkPoints && (
-              <svg width="100" height="28" style={{ marginTop:4 }}>
+              <svg width="100" height="28" className="mt-2 drop-shadow-md">
                 <defs>
                   <linearGradient id={`sp-${alarm.id}`} x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor={cfg.color} stopOpacity="0.3" />
+                    <stop offset="0%" stopColor={cfg.color} stopOpacity="0.2" />
                     <stop offset="100%" stopColor={cfg.color} stopOpacity="1" />
                   </linearGradient>
                 </defs>
-                <polyline points={sparkPoints} fill="none" stroke={`url(#sp-${alarm.id})`} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points={sparkPoints} fill="none" stroke={`url(#sp-${alarm.id})`} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
           </div>
         </div>
 
         {/* Actions */}
-        <div style={{ marginTop:12, paddingTop:12, borderTop:`1px solid ${C.border}`, display:'flex', gap:6 }} onClick={e => e.stopPropagation()}>
-          <Btn variant="secondary" size="sm" onClick={onAcknowledge} style={{ flex:1 }}>Acknowledge</Btn>
-          <select onChange={e => e.target.value && onSnooze(Number(e.target.value))} defaultValue="" style={{ flex:1, background:C.elevated, border:`1px solid ${C.border}`, borderRadius:7, padding:'5px 24px 5px 10px', fontSize:12, color:C.textSecondary, fontFamily:'Inter,sans-serif', cursor:'pointer', appearance:'none', backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A5A7A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat:'no-repeat', backgroundPosition:'right 8px center' }}>
+        <div className="mt-4 pt-3 border-t border-surface-border/60 flex gap-2" onClick={e => e.stopPropagation()}>
+          <button type="button" onClick={onAcknowledge} className="flex-1 inline-flex items-center justify-center gap-2 font-body font-medium text-xs rounded-lg px-3 py-2 border bg-transparent text-text-secondary border-surface-border hover:bg-surface-elevated hover:text-text-primary transition-colors active:scale-95 outline-none">
+            Acknowledge
+          </button>
+          
+          <select onChange={e => e.target.value && onSnooze(Number(e.target.value))} defaultValue="" className="flex-1 bg-surface-elevated border border-surface-border rounded-lg px-3 py-2 text-xs text-text-secondary font-body cursor-pointer appearance-none outline-none hover:bg-surface-hover hover:text-text-primary transition-colors" style={{ backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B9CC8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat:'no-repeat', backgroundPosition:'right 10px center' }}>
             <option value="" disabled>Snooze…</option>
             <option value="15">15 min</option>
             <option value="60">1 hour</option>
             <option value="240">4 hours</option>
             <option value="480">Next shift</option>
           </select>
-          <Btn variant="danger" size="sm" onClick={onEscalate} style={{ flex:1 }}>Escalate</Btn>
+          
+          <button type="button" onClick={onEscalate} className="flex-1 inline-flex items-center justify-center gap-2 font-body font-medium text-xs rounded-lg px-3 py-2 border bg-isa-p2/10 text-isa-p2 border-isa-p2/30 hover:bg-isa-p2/20 hover:shadow-[0_0_14px_rgba(255,140,0,0.25)] transition-all active:scale-95 outline-none">
+            Escalate
+          </button>
         </div>
       </div>
     </motion.article>
-  )
-}
-
-function Btn({ variant='secondary', size='md', onClick, children, style={} }) {
-  const [hov, setHov] = useState(false)
-  const [act, setAct] = useState(false)
-  const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6, fontFamily:'Inter,sans-serif', fontWeight:500, fontSize: size==='sm'?12:13, lineHeight:1, borderRadius: size==='sm'?7:9, padding: size==='sm'?'5px 11px':'8px 14px', border:'1px solid transparent', transition:'all 160ms', whiteSpace:'nowrap', cursor:'pointer', minHeight: size==='sm'?28:34 }
-  const v = variant==='primary' ? { background:C.accent, color:C.base, borderColor:C.accent, fontWeight:600 }
-    : variant==='danger' ? { background:C.p2Dim, color:C.p2, borderColor:C.p2Border }
-    : { background:'transparent', color:C.textSecondary, borderColor:C.border }
-  const hovStyle = variant==='primary' ? { background:'#00BFAA', boxShadow:'0 0 20px rgba(0,212,170,0.4)', transform:'translateY(-1px)' }
-    : variant==='danger' ? { background:'rgba(255,140,0,0.2)', boxShadow:'0 0 14px rgba(255,140,0,0.25)', transform:'translateY(-1px)' }
-    : { borderColor:'rgba(0,212,170,0.35)', color:C.textPrimary, background:'rgba(0,212,170,0.06)', transform:'translateY(-1px)' }
-  return (
-    <button type="button" onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>{setHov(false);setAct(false)}} onMouseDown={()=>setAct(true)} onMouseUp={()=>setAct(false)}
-      style={{ ...base, ...v, ...(hov?hovStyle:{}), ...(act?{transform:'scale(0.97)',boxShadow:'none'}:{}), ...style }}>
-      {children}
-    </button>
   )
 }

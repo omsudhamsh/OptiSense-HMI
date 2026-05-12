@@ -17,9 +17,9 @@ from engine.isa_scoring import score_alarm_health
 from simulator.opc_ua_server import run_opc_ua_server
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=["http://localhost:5173", "http://localhost:5174"])
 socketio = SocketIO(
-    app, cors_allowed_origins="http://localhost:5173", async_mode="threading"
+    app, cors_allowed_origins=["http://localhost:5173", "http://localhost:5174"], async_mode="threading"
 )
 alarm_manager = AlarmManager()
 _update_thread_started = False
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     alarm_manager.load_initial_alarms()
     initialize_gemini()
     start_background_threads()
-    socketio.run(app, debug=True, port=5000, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, use_reloader=False, port=5000, allow_unsafe_werkzeug=True)
