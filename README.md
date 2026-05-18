@@ -44,8 +44,6 @@
 
 ## 🚨 The Problem
 
-## 🚨 The Problem
-
 Industrial operators face critical challenges in alarm management:
 
 - **Alarm Floods:** 200+ simultaneous alarms per shift with no clear priority path
@@ -66,8 +64,6 @@ OptiSense HMI transforms alarm chaos into actionable intelligence:
 - **Shift Handover Report:** Compress critical context into a single, actionable view
 
 ---
-
-## 🌟 Why This Is Different
 
 ## 🌟 Why This Is Different
 
